@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const productoRoutes = require('./routes/producto.routes');
+const createSchema = require('./db/create-schema');
 
 const app = express();
 
@@ -33,6 +34,13 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+createSchema()
+    .then(() => {
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+    })
+    .catch((err) => {
+        console.error('No se pudo preparar la tabla productos:', err);
+        process.exitCode = 1;
+    });
